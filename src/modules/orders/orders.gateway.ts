@@ -1,7 +1,7 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderDto } from './dto/requestDTO/create-order.dto';
+import { UpdateOrderDto } from './dto/requestDTO/update-order.dto';
 
 @WebSocketGateway()
 export class OrdersGateway {

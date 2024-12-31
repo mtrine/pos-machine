@@ -16,7 +16,7 @@ async function bootstrap() {
     whitelist: true,
   }));
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
-  app.useGlobalFilters(new MongoExceptionFilter(),new HttpExceptionFilter());
+  app.useGlobalFilters(new MongoExceptionFilter());
   app.setGlobalPrefix('/api/');
   app.enableVersioning({
     defaultVersion: '1',

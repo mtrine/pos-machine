@@ -1,23 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTableDto } from './dto/create-table.dto';
-import { UpdateTableDto } from './dto/update-table.dto';
+import { CreateTableDto } from './dto/requestDTO/create-table.dto';
+import { UpdateTableDto } from './dto/requestDTO/update-table.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Table } from './schemas/table.schema';
+import { Model } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
+import * as QRCode from "qrcode";
 
 @Injectable()
 export class TablesService {
-  create(createTableDto: CreateTableDto) {
-    return 'This action adds a new table';
+  constructor(
+    @InjectModel(Table.name) private readonly tableModel: Model<Table>,
+    private configService: ConfigService
+  ) {}
+  async create(createTableDto: CreateTableDto) {
+    const qrUrl = `${this.configService.get<string>('CLIENT_URI')}/table/${createTableDto.tableNumber}`
+    const qrCode = await QRCode.toDataURL(qrUrl)
+    const createdTable = await this.tableModel.create({
+      tableNumber:createTableDto.tableNumber,
+      qrCode:qrCode
+    })
+    return createdTable;
   }
 
-  findAll() {
-    return `This action returns all tables`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} table`;
-  }
-
-  update(id: number, updateTableDto: UpdateTableDto) {
-    return `This action updates a #${id} table`;
+  async findAll() {
+    return await this.tableModel.find();
   }
 
   remove(id: number) {

@@ -10,6 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
     }),
-    ProductsModule, InvoicesModule, CategoriesModule, OrdersModule, TablesModule],
+    ProductsModule, InvoicesModule, CategoriesModule, OrdersModule, TablesModule, CloudinaryModule],
   controllers: [AppController],
   providers: [AppService],
 })

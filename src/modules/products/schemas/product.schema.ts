@@ -8,9 +8,6 @@ export class Product {
     @Prop({ required: true, unique: true })
     name: string;
 
-    @Prop()
-    description: string;
-
     @Prop({ required: true })
     price: number;
 
@@ -19,11 +16,16 @@ export class Product {
 
 
     @Prop({
-        type: Types.ObjectId,
-        ref: "Category",
+        type: {
+            _id: { type: Types.ObjectId, ref: "Category", required: true },
+            name: { type: String, required: true },
+        },
         required: true,
     })
-    category: Types.ObjectId;
+    category: {
+        categoryId: Types.ObjectId;
+        name: string;
+    };
 
     @Prop({ default: true })
     availability: boolean;

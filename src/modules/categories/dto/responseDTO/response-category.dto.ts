@@ -3,7 +3,7 @@ import { Types } from "mongoose";
 
 export class CategoryResponseDTO {
     @Expose()
-     @Transform(({ obj }) => obj._id.toString()) // Chuyển ObjectId thành chuỗi
+    @Transform(({ obj }) => obj._id.toString()) // Chuyển ObjectId thành chuỗi
     _id: string;
 
     @Expose()

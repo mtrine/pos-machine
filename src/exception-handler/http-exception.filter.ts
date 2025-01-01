@@ -11,7 +11,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // Custom mã lỗi
     const errorResponse = exception.getResponse();
-    let code = 'UNKNOWN_ERROR'; // Mã lỗi mặc định
+    let code = 1000; // Mã lỗi mặc định
 
     // Kiểm tra nếu errorResponse là object và có custom code
     if (typeof errorResponse === 'object' && errorResponse !== null) {

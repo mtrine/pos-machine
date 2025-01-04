@@ -1,7 +1,7 @@
 import { Expose, Transform, Type } from "class-transformer";
 import { CategoryResponseDTO } from "src/modules/categories/dto/responseDTO/response-category.dto";
 
-export class ResponseProductDto {
+export class ProductResponseDTO {
 
     @Expose()
     @Transform(({ obj }) => obj._id.toString()) // Chuyển ObjectId thành chuỗi

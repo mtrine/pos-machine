@@ -1,11 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, Types } from "mongoose";
-
+import { Types } from "mongoose";
 
 @Schema({ timestamps: true })
 export class Invoice {
-    @Prop({ type: Types.ObjectId, ref: "Order", required: true })
-    orderId: Types.ObjectId; // ID của đơn hàng liên kết
+    @Prop({ type: [{ type: Types.ObjectId, ref: "Order", required: true }] })
+    orderIds: Types.ObjectId[]; // ID của các đơn hàng liên kết
 
     @Prop({
         type: [

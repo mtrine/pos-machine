@@ -8,27 +8,31 @@ export type OrderDocument = HydratedDocument<Order>;
 export class Order {
     @Prop({
         type: {
-            id: { type: Types.ObjectId, ref: "Table", required: true },
-            number: { type: Number, required: true },
+            _id: { type: Types.ObjectId, ref: "Table", required: true },
+            tableNumber: { type: Number, required: true },
         },
         required: true,
     })
     table: {
-        id: Types.ObjectId; // ID của bàn (liên kết với collection `tables`)
-        number: number; // Số bàn
+        _id: Types.ObjectId; // ID của bàn (liên kết với collection `tables`)
+        tableNumber: number; // Số bàn
     }; // Thông tin bàn
 
     @Prop({
         type: [
             {
-                productId: { type: Types.ObjectId, ref: "Product", required: true },
+                _id: { type: Types.ObjectId, ref: "Product", required: true },
+                name: { type: String, required: true },
+                note: { type: String, default: "" },
                 quantity: { type: Number, required: true, min: 1 },
             },
         ],
         required: true,
     })
-    items: {
-        productId: Types.ObjectId; // ID món ăn
+    product: {
+        _id: Types.ObjectId; // ID món ăn
+        name: string; // Tên món ăn
+        note: string; // Ghi chú món ăn
         quantity: number; // Số lượng món ăn
     }[]; // Danh sách món ăn
 
@@ -37,9 +41,6 @@ export class Order {
 
     @Prop({ type: String, enum: Object.values(OrderStatus), default: OrderStatus.PREPARING })
     status: OrderStatus;
-
-    @Prop({ type: String, default: "" })
-    note: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

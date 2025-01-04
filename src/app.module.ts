@@ -10,18 +10,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(
-      { isGlobal: true,}
+      { isGlobal: true, }
     ),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),        
-        }),
+        uri: configService.get<string>('MONGO_URI'),
+      }),
       inject: [ConfigService],
     }),
     CacheModule.register({
@@ -29,9 +29,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
       store: redisStore,
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
+      ttl: 100,
     }),
     ProductsModule, InvoicesModule, CategoriesModule, OrdersModule, TablesModule, CloudinaryModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

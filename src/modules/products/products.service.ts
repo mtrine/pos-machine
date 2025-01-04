@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, set } from 'mongoose';
 import { Product } from './schemas/product.schema';
 import { Category } from '../categories/schemas/category.schema';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CloudinaryService } from 'src/modules/cloudinary/cloudinary.service';
 
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ProductsService {
   async create(file: Express.Multer.File, createProductDto: CreateProductDto) {
     const category = await this.categoryModel.findById(createProductDto.categoryId);
     if (!category) {
-      throw new Error('Category not found');
+      throw new NotFoundException('Category not found');
     }
 
     // Upload ảnh lên Cloudinary
@@ -61,7 +61,7 @@ export class ProductsService {
       // Xóa ảnh cũ khỏi Cloudinary (nếu cần)
       if (product.imageUrl) {
         const publicId = this.extractPublicIdFromUrl(product.imageUrl);
-        await this.cloudinaryService.deleteFile(publicId,"products");
+        await this.cloudinaryService.deleteFile(publicId, "products");
       }
 
       // Gán URL ảnh mới
@@ -73,7 +73,7 @@ export class ProductsService {
       ...updateProductDto,
       category: { _id: category._id, name: category.name },
       updatedAt: new Date(),
-    },{new:true});
+    }, { new: true });
 
     return updateCategory;
   }
@@ -87,13 +87,13 @@ export class ProductsService {
 
   async remove(id: string) {
     const deleteProduct = await this.productModel.findByIdAndDelete(id);
-    if(!deleteProduct){
+    if (!deleteProduct) {
       throw new NotFoundException('Product not found');
     }
-    if(deleteProduct.imageUrl){
+    if (deleteProduct.imageUrl) {
       setTimeout(async () => {
         const publicId = this.extractPublicIdFromUrl(deleteProduct.imageUrl);
-        this.cloudinaryService.deleteFile(publicId,"products");
+        this.cloudinaryService.deleteFile(publicId, "products");
       })
     }
     return deleteProduct;

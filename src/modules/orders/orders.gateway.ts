@@ -1,34 +1,37 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/requestDTO/create-order.dto';
 import { UpdateOrderDto } from './dto/requestDTO/update-order.dto';
+import { Server, Socket } from 'socket.io';
+
 
 @WebSocketGateway()
 export class OrdersGateway {
-  constructor(private readonly ordersService: OrdersService) {}
+  @WebSocketServer()
+  server: Server;
+  constructor(private readonly ordersService: OrdersService) { }
 
   @SubscribeMessage('createOrder')
-  create(@MessageBody() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(
+    @MessageBody() createOrderDto: CreateOrderDto,
+    @ConnectedSocket() client: Socket
+  ) {
+    const newOrder = await this.ordersService.create(createOrderDto);
+
+    // Phát sự kiện tới tất cả client trong room "owner" (chủ quán)
+    this.server.to('owner').emit('orderCreated', newOrder);
+
+    // Phản hồi cho khách hàng đã gửi yêu cầu
+    client.emit('orderCreatedAck', newOrder);
+
+    return newOrder;
   }
 
-  @SubscribeMessage('findAllOrders')
-  findAll() {
-    return this.ordersService.findAll();
+  @SubscribeMessage('joinOwnerRoom')
+  joinOwnerRoom(@ConnectedSocket() client: Socket) {
+    client.join('owner');
+    client.emit('joinedOwnerRoom', { message: 'You have joined the owner room' });
   }
 
-  @SubscribeMessage('findOneOrder')
-  findOne(@MessageBody() id: number) {
-    return this.ordersService.findOne(id);
-  }
-
-  @SubscribeMessage('updateOrder')
-  update(@MessageBody() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(updateOrderDto.id, updateOrderDto);
-  }
-
-  @SubscribeMessage('removeOrder')
-  remove(@MessageBody() id: number) {
-    return this.ordersService.remove(id);
-  }
+  
 }

@@ -4,9 +4,8 @@ import { CreateProductDto } from './dto/requestDTO/create-product.dto';
 import { UpdateProductDto } from './dto/requestDTO/update-product.dto';
 import { ResponseMessage } from 'src/decorators/response-message.decorator';
 import { Serialize } from 'src/decorators/serialize.decorator';
-import { ResponseProductDto } from './dto/responseDTO/response-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import multer from 'multer';
+import { ProductResponseDTO } from './dto/responseDTO/response-product.dto';
 
 
 @Controller('products')
@@ -15,7 +14,7 @@ export class ProductsController {
 
   @Post()
   @ResponseMessage('Product created successfully')
-  @Serialize(ResponseProductDto)
+  @Serialize(ProductResponseDTO)
   @UseInterceptors(FileInterceptor('file'))
   create(@UploadedFile() file: Express.Multer.File,@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(file,createProductDto);
@@ -23,7 +22,7 @@ export class ProductsController {
 
   @Get()
   @ResponseMessage('Product list fetched successfully')
-  @Serialize(ResponseProductDto)
+  @Serialize(ProductResponseDTO)
   async findAll() {
     return await this.productsService.findAll();
   }
@@ -31,12 +30,14 @@ export class ProductsController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file'))
   @ResponseMessage('Product updated successfully')
-  @Serialize(ResponseProductDto)
+  @Serialize(ProductResponseDTO)
   async update(@UploadedFile() file: Express.Multer.File,@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return await this.productsService.update(id, file, updateProductDto);
   }
 
   @Delete(':id')
+  @ResponseMessage('Product deleted successfully')
+  @Serialize(ProductResponseDTO)
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }

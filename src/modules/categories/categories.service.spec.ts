@@ -96,4 +96,24 @@ describe('CategoriesService', () => {
 
     });
   })
+
+  describe('remove', () => {
+    it('should remove a category', async () => {
+      const id = '6774bef139f0007c943a572a';
+      const mockDeletedCategory = {
+        "_id": "6774bef139f0007c943a572a",
+        "name": "Category 1'",
+        "createdAt": "2025-01-01T04:05:05.780Z",
+        "updatedAt": "2025-01-01T04:05:05.780Z"
+      };
+
+      mockCategoryModel.findByIdAndDelete.mockResolvedValue(mockDeletedCategory);
+
+      const result = await service.remove(id);
+
+      expect(categoryModel.findByIdAndDelete).toHaveBeenCalledWith(id);
+      expect(result).toEqual(mockDeletedCategory);
+
+    });
+  })
 });

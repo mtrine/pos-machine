@@ -69,13 +69,13 @@ export class ProductsService {
     }
 
     // Cập nhật sản phẩm
-    const updateCategory = await this.productModel.findByIdAndUpdate(productId, {
+    const updateProduct = await this.productModel.findByIdAndUpdate(productId, {
       ...updateProductDto,
       category: { _id: category._id, name: category.name },
       updatedAt: new Date(),
     }, { new: true });
 
-    return updateCategory;
+    return updateProduct;
   }
 
   private extractPublicIdFromUrl(url: string): string {

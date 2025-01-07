@@ -77,8 +77,8 @@ export class OrdersService {
       table: { _id: table._id, tableNumber: table.tableNumber },
     });
   
-    table.status = TableStatus.BUSY;
-    await table.save();
+    // table.status = TableStatus.BUSY;
+    // await table.save();
   
     return newOrder;
   }
@@ -116,7 +116,7 @@ export class OrdersService {
     return order;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     const order = this.orderModel.findByIdAndDelete(id);
     if (!order) {
       throw new NotFoundException('Order not found');

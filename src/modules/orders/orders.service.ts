@@ -73,7 +73,7 @@ export class OrdersService {
     // Nếu không có đơn hàng hiện tại, tạo đơn hàng mới
     const newOrder = await this.orderModel.create({
       ...createOrderDto,
-      items: items,
+      product: items,
       table: { _id: table._id, tableNumber: table.tableNumber },
     });
   

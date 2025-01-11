@@ -234,7 +234,9 @@ describe('InvoicesService', () => {
 
       const result = await service.remove(invoiceId);
 
-      expect(mockInvoiceModel.findByIdAndDelete).toHaveBeenCalledWith(invoiceId);
+      expect(mockInvoiceModel.findByIdAndDelete).toHaveBeenCalledWith(
+        invoiceId,
+      );
       expect(result).toEqual(mockInvoice);
     });
 

@@ -9,37 +9,35 @@ import { getModelToken } from '@nestjs/mongoose';
 
 describe('TablesService', () => {
   let service: TablesService;
-  let tableModel: Model<Table>
-  let configService: ConfigService
-
+  let tableModel: Model<Table>;
+  let configService: ConfigService;
 
   const mockTableModel = {
     find: jest.fn(),
     create: jest.fn(),
-  }
+  };
 
   const mockConfigService = {
-    get: jest.fn()
-  }
+    get: jest.fn(),
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TablesService,
         {
           provide: getModelToken(Table.name),
-          useValue: mockTableModel
+          useValue: mockTableModel,
         },
         {
           provide: ConfigService,
-          useValue: mockConfigService
-        }
+          useValue: mockConfigService,
+        },
       ],
     }).compile();
 
     service = module.get<TablesService>(TablesService);
     tableModel = module.get<Model<Table>>(getModelToken(Table.name));
-    configService = module.get<ConfigService>(ConfigService)
-
+    configService = module.get<ConfigService>(ConfigService);
   });
 
   it('should be defined', () => {
@@ -59,7 +57,9 @@ describe('TablesService', () => {
       const result = await service.create(createTableDto);
 
       expect(configService.get).toHaveBeenCalledWith('CLIENT_URI');
-      expect(QRCode.toDataURL).toHaveBeenCalledWith('http://localhost:3000/table/1');
+      expect(QRCode.toDataURL).toHaveBeenCalledWith(
+        'http://localhost:3000/table/1',
+      );
       expect(mockTableModel.create).toHaveBeenCalledWith({
         tableNumber: 1,
         qrCode: mockQrCode,

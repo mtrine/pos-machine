@@ -16,18 +16,14 @@ export class ProductsService {
     private cloudinaryService: CloudinaryService
   ) { }
   async create(file: Express.Multer.File, createProductDto: CreateProductDto) {
-    const category = await this.categoryModel.findById(createProductDto.categoryId);
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
+    
     // Upload ảnh lên Cloudinary
     const uploadResult = await this.cloudinaryService.uploadFile(file, 'products');
 
     // Tạo sản phẩm mới
     const newProduct = await this.productModel.create({
       ...createProductDto,
-      category: { _id: category._id, name: category.name },
+      category: createProductDto.categoryId,
       imageUrl: uploadResult.secure_url,  // Sử dụng URL ảnh từ Cloudinary
     });
 
@@ -35,7 +31,9 @@ export class ProductsService {
   }
 
   async findAll() {
-    return await this.productModel.find();;
+    return await this.productModel.find()
+    .populate('category', 'name')
+    .lean();
   }
 
   async update(productId: string, file: Express.Multer.File, updateProductDto: UpdateProductDto) {
@@ -45,11 +43,6 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    // Kiểm tra danh mục (nếu categoryId được cập nhật)
-    const category = await this.categoryModel.findById(updateProductDto.categoryId);
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
 
 
 
@@ -71,7 +64,7 @@ export class ProductsService {
     // Cập nhật sản phẩm
     const updateProduct = await this.productModel.findByIdAndUpdate(productId, {
       ...updateProductDto,
-      category: { _id: category._id, name: category.name },
+      category: updateProductDto.categoryId,
       updatedAt: new Date(),
     }, { new: true });
 

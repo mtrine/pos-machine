@@ -9,9 +9,7 @@ export class Invoice {
     @Prop({
         type: [
             {
-                productId: { type: Types.ObjectId, ref: "Product", required: true },
-                name: { type: String, required: true },
-                price: { type: Number, required: true },
+                product: { type: Types.ObjectId, ref: "Product", required: true },
                 quantity: { type: Number, required: true, min: 1 },
                 totalPrice: { type: Number, required: true },
             },
@@ -19,9 +17,7 @@ export class Invoice {
         required: true,
     })
     items: {
-        productId: Types.ObjectId; // ID món ăn
-        name: string; // Tên món ăn
-        price: number; // Giá một đơn vị
+        product: Types.ObjectId; // ID món ăn
         quantity: number; // Số lượng
         totalPrice: number; // Giá = price * quantity
     }[];
@@ -34,3 +30,4 @@ export class Invoice {
 }
 
 export const InvoiceSchema = SchemaFactory.createForClass(Invoice);
+InvoiceSchema.path('items').schema.set('_id', false);

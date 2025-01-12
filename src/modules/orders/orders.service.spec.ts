@@ -88,7 +88,7 @@ describe('OrdersService', () => {
         tableId: 'table_id',
         items: [
           {
-            productId: 'product_id',
+            product: 'product_id',
             note: 'note',
             quantity: 1
           }
@@ -212,7 +212,7 @@ describe('OrdersService', () => {
       expect(result).toEqual(mockOrder);
     })
   });
-  
+
   describe('delete', () => {
     it('should delete an order', async () => {
       const mockOrder = {

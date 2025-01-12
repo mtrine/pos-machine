@@ -7,31 +7,24 @@ export type OrderDocument = HydratedDocument<Order>;
 @Schema({ timestamps: true })
 export class Order {
     @Prop({
-        type: {
-            _id: { type: Types.ObjectId, ref: "Table", required: true },
-            tableNumber: { type: Number, required: true },
-        },
-        required: true,
-    })
-    table: {
-        _id: Types.ObjectId; // ID của bàn (liên kết với collection `tables`)
-        tableNumber: number; // Số bàn
-    }; // Thông tin bàn
+        type: Types.ObjectId, ref: "Table", required: true
+    },
+    )
+    table: Types.ObjectId; // ID của bàn (liên kết với collection `tables`)
+        // Thông tin bàn
 
     @Prop({
         type: [
             {
-                _id: { type: Types.ObjectId, ref: "Product", required: true },
-                name: { type: String, required: true },
+                product: { type: Types.ObjectId, ref: "Product", required: true },
                 note: { type: String, default: "" },
                 quantity: { type: Number, required: true, min: 1 },
             },
         ],
         required: true,
     })
-    product: {
-        _id: Types.ObjectId; // ID món ăn
-        name: string; // Tên món ăn
+    products: {
+        product: Types.ObjectId; // ID món ăn
         note: string; // Ghi chú món ăn
         quantity: number; // Số lượng món ăn
     }[]; // Danh sách món ăn
@@ -44,3 +37,4 @@ export class Order {
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+OrderSchema.path('products').schema.set('_id', false);

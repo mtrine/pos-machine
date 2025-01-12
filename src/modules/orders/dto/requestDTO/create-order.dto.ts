@@ -5,7 +5,7 @@ import { Type } from "class-transformer";
 class ItemDto {
     @IsMongoId()
     @IsNotEmpty()
-    productId: string;
+    product: string;
 
     note: string;
 

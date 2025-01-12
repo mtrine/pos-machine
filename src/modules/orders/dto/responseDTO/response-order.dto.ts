@@ -5,8 +5,8 @@ import { TableResponseDTO } from "src/modules/tables/dto/responseDTO/response-ta
 
 export class ItemResponseDTO {
     @Expose()
-    @Transform(({ obj }) => obj._id.toString()) 
-    _id: string;
+    @Type(() => ProductResponseDTO)
+    product: ProductResponseDTO;
 
     @Expose()
     name: string;
@@ -29,7 +29,7 @@ export class OrderResponseDTO {
 
     @Expose()
     @Type(() => ItemResponseDTO)
-    product:ItemResponseDTO[];
+    products:ItemResponseDTO[];
 
     @Expose()
     totalPrice: number;

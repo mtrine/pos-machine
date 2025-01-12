@@ -16,16 +16,12 @@ export class Product {
 
 
     @Prop({
-        type: {
-            _id: { type: Types.ObjectId, ref: "Category", required: true },
-            name: { type: String, required: true },
-        },
+        type: Types.ObjectId, 
+        ref: "Category",
         required: true,
     })
-    category: {
-        categoryId: Types.ObjectId;
-        name: string;
-    };
+    category: Types.ObjectId;
+  
 
     @Prop({ default: true })
     availability: boolean;

@@ -20,7 +20,7 @@ export class InvoicesController {
 
   @Post()
   @ResponseMessage('Invoice created successfully')
-  @Serialize(InvoiceResponseDto)
+  // @Serialize(InvoiceResponseDto)
   async create(@Body() createInvoiceDto: CreateInvoiceDto) {
     return await this.invoicesService.create(createInvoiceDto);
   }
@@ -39,15 +39,15 @@ export class InvoicesController {
     return await this.invoicesService.findOne(id);
   }
 
-  @Patch(':id')
-  @ResponseMessage('Invoice updated successfully')
-  @Serialize(InvoiceResponseDto)
-  async update(
-    @Param('id') id: string,
-    @Body() updateInvoiceDto: UpdateInvoiceDto,
-  ) {
-    return await this.invoicesService.update(id, updateInvoiceDto);
-  }
+  // @Patch(':id')
+  // @ResponseMessage('Invoice updated successfully')
+  // @Serialize(InvoiceResponseDto)
+  // async update(
+  //   @Param('id') id: string,
+  //   @Body() updateInvoiceDto: UpdateInvoiceDto,
+  // ) {
+  //   return await this.invoicesService.update(id, updateInvoiceDto);
+  // }
 
   @Delete(':id')
   @ResponseMessage('Invoice delete successfully')

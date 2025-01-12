@@ -1,4 +1,5 @@
 import { Expose, Transform, Type } from 'class-transformer';
+import { ProductResponseDTO } from 'src/modules/products/dto/responseDTO/response-product.dto';
 
 export class ListOrderResponseDto {
   @Expose()
@@ -8,17 +9,11 @@ export class ListOrderResponseDto {
 
 export class ItemResponseDTO {
   @Expose()
-  @Transform(({ obj }) => obj._id.toString())
-  _id: string;
-
-  @Expose()
-  name: string;
+  @Type(()=>ProductResponseDTO)
+  product: ProductResponseDTO;
 
   @Expose()
   quantity: number;
-
-  @Expose()
-  price: string;
 
   @Expose()
   totalPrice: string;

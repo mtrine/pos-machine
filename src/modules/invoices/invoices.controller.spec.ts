@@ -115,34 +115,6 @@ describe('InvoicesController', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update an invoice', async () => {
-      const updateInvoiceDto = { orderId: ['1'], note: 'Test unit update' };
-      const mockItems = [
-        {
-          productId: '1',
-          name: 'pepsi',
-          price: 15000,
-          quantity: 1,
-          totalPrice: 15000,
-        },
-      ];
-      const mockTotalPrice = 15000;
-      const mockUpdatedInvoice = {
-        orderIds: ['1'],
-        items: mockItems,
-        totalPrice: mockTotalPrice,
-        note: 'Test unit update',
-      };
-
-      mockTableService.update.mockResolvedValue(mockUpdatedInvoice);
-
-      const result = await controller.update('1', updateInvoiceDto);
-
-      expect(mockTableService.update).toHaveBeenCalledWith('1', updateInvoiceDto);
-      expect(result).toEqual(mockUpdatedInvoice);
-    });
-  });
 
   describe('remove', () => {
     it('should remove an invoice', async () => {

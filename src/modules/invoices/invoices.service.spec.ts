@@ -1,253 +1,223 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { InvoicesService } from './invoices.service';
-// import { Model } from 'mongoose';
-// import { Invoice } from './schemas/invoice.schema';
-// import { Order } from '../orders/schemas/order.schema';
-// import { Product } from '../products/schemas/product.schema';
-// import { find } from 'rxjs';
-// import { getModelToken } from '@nestjs/mongoose';
-// import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { InvoicesService } from './invoices.service';
+import { getModelToken } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Invoice } from './schemas/invoice.schema';
+import { Order } from '../orders/schemas/order.schema';
+import { Product } from '../products/schemas/product.schema';
+import { CreateInvoiceDto } from './dto/requestDTO/create-invoice.dto';
+import { NotFoundException } from '@nestjs/common';
 
-// describe('InvoicesService', () => {
-//   let service: InvoicesService;
-//   let invoiceModel: Model<Invoice>;
-//   let orderModel: Model<Order>;
-//   let productModel: Model<Product>;
+describe('InvoicesService', () => {
+  let service: InvoicesService;
+  let invoiceModel: Model<Invoice>;
+  let orderModel: Model<Order>;
+  let productModel: Model<Product>;
 
-//   const mockInvoiceModel = {
-//     create: jest.fn(),
-//     find: jest.fn(),
-//     findById: jest.fn(),
-//     findByIdAndUpdate: jest.fn(),
-//     findByIdAndDelete: jest.fn(),
-//   };
+  const mockInvoiceModel = {
+    create: jest.fn(),
+    find: jest.fn(),
+    findById: jest.fn(),
+    findByIdAndDelete: jest.fn(),
+  };
 
-//   const mockOrderModel = {
-//     find: jest.fn(),
-//   };
+  const mockOrderModel = {
+    find: jest.fn(),
+  };
 
-//   const mockProductModel = {
-//     findById: jest.fn(),
-//   };
+  const mockProductModel = {};
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         InvoicesService,
-//         {
-//           provide: getModelToken(Invoice.name),
-//           useValue: mockInvoiceModel,
-//         },
-//         {
-//           provide: getModelToken(Order.name),
-//           useValue: mockOrderModel,
-//         },
-//         {
-//           provide: getModelToken(Product.name),
-//           useValue: mockProductModel,
-//         },
-//       ],
-//     }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        InvoicesService,
+        {
+          provide: getModelToken(Invoice.name),
+          useValue: mockInvoiceModel,
+        },
+        {
+          provide: getModelToken(Order.name),
+          useValue: mockOrderModel,
+        },
+        {
+          provide: getModelToken(Product.name),
+          useValue: mockProductModel,
+        },
+      ],
+    }).compile();
 
-//     service = module.get<InvoicesService>(InvoicesService);
-//     invoiceModel = module.get<Model<Invoice>>(getModelToken(Invoice.name));
-//     orderModel = module.get<Model<Order>>(getModelToken(Order.name));
-//     productModel = module.get<Model<Product>>(getModelToken(Product.name));
-//   });
+    service = module.get<InvoicesService>(InvoicesService);
+    invoiceModel = module.get<Model<Invoice>>(getModelToken(Invoice.name));
+    orderModel = module.get<Model<Order>>(getModelToken(Order.name));
+    productModel = module.get<Model<Product>>(getModelToken(Product.name));
+  });
 
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-//   describe('create', () => {
-//     it('should create an invoice', async () => {
-//       const createInvoiceDto = { orderId: ['orderId1'], note: 'Test unit' };
-//       const mockOrder = {
-//         _id: 'orderId1',
-//         product: [{ _id: 'productId1', quantity: 1 }],
-//       };
-//       const mockProduct = { _id: 'productId1', name: 'Product 1', price: 100 };
-//       const mockItems = [
-//         {
-//           productId: 'productId1',
-//           name: 'Product 1',
-//           price: 100,
-//           quantity: 1,
-//           totalPrice: 100,
-//         },
-//       ];
-//       const mockCreatedInvoice = {
-//         orderIds: ['orderId1'],
-//         items: mockItems,
-//         totalPrice: 100,
-//         note: 'Test unit',
-//       };
+  describe('create', () => {
+    const mockCreateInvoiceDto: CreateInvoiceDto = {
+      orderId: ['order1', 'order2'],
+      note: 'Test invoice',
+    };
 
-//       jest.spyOn(orderModel, 'find').mockResolvedValue([mockOrder]);
-//       jest.spyOn(productModel, 'findById').mockResolvedValue(mockProduct);
-//       mockInvoiceModel.create.mockResolvedValue(mockCreatedInvoice);
+    const mockOrders = [
+      {
+        _id: 'order1',
+        products: [
+          {
+            product: { _id: 'product1', name: 'Product 1', price: 100 },
+            quantity: 2,
+          },
+        ],
+      },
+      {
+        _id: 'order2',
+        products: [
+          {
+            product: { _id: 'product2', name: 'Product 2', price: 150 },
+            quantity: 1,
+          },
+        ],
+      },
+    ];
 
-//       const result = await service.create(createInvoiceDto);
+    const mockNewInvoice = {
+      _id: 'invoice1',
+      orderIds: ['order1', 'order2'],
+      items: [
+        {
+          product: { _id: 'product1', name: 'Product 1', price: 100 },
+          quantity: 2,
+          totalPrice: 200,
+        },
+        {
+          product: { _id: 'product2', name: 'Product 2', price: 150 },
+          quantity: 1,
+          totalPrice: 150,
+        },
+      ],
+      totalPrice: 350,
+      note: 'Test invoice',
+    };
 
-//       expect(orderModel.find).toHaveBeenCalledWith({
-//         _id: { $in: createInvoiceDto.orderId },
-//       });
-//       expect(productModel.findById).toHaveBeenCalledWith(
-//         mockOrder.product[0]._id,
-//       );
-//       expect(mockInvoiceModel.create).toHaveBeenCalledWith({
-//         orderIds: createInvoiceDto.orderId,
-//         items: mockItems,
-//         totalPrice: 100,
-//         note: 'Test unit',
-//       });
-//       expect(result).toEqual(mockCreatedInvoice);
-//     });
-//   });
+    it('should create an invoice successfully', async () => {
+      mockOrderModel.find.mockImplementation(() => ({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue(mockOrders),
+        }),
+      }));
 
-//   describe('findAll', () => {
-//     it('should return all invoices', async () => {
-//       const mockInvoices = [
-//         { _id: 'invoiceId1', note: 'test' },
-//         { _id: 'invoiceId2', note: 'test' },
-//       ];
+      mockInvoiceModel.create.mockResolvedValue(mockNewInvoice);
 
-//       mockInvoiceModel.find.mockResolvedValue(mockInvoices);
+      const result = await service.create(mockCreateInvoiceDto);
 
-//       const result = await service.findAll();
+      expect(mockOrderModel.find).toHaveBeenCalledWith({
+        _id: { $in: mockCreateInvoiceDto.orderId },
+      });
+      expect(mockInvoiceModel.create).toHaveBeenCalled();
+      expect(result).toEqual(mockNewInvoice);
+    });
 
-//       expect(mockInvoiceModel.find).toHaveBeenCalled();
-//       expect(result).toEqual(mockInvoices);
-//     });
-//   });
+    it('should throw NotFoundException if orders are not found', async () => {
+      mockOrderModel.find.mockImplementation(() => ({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue([mockOrders[0]]), // Only one order found
+        }),
+      }));
 
-//   describe('findOne', () => {
-//     it('should return an invoice', async () => {
-//       const invoiceId = 'invoiceId1';
-//       const mockInvoice = { _id: 'invoiceId1', note: 'test' };
+      await expect(service.create(mockCreateInvoiceDto)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
 
-//       mockInvoiceModel.findById.mockResolvedValue(mockInvoice);
+  describe('findAll', () => {
+    const mockInvoices = [
+      {
+        _id: 'invoice1',
+        items: [],
+        totalPrice: 100,
+      },
+      {
+        _id: 'invoice2',
+        items: [],
+        totalPrice: 200,
+      },
+    ];
 
-//       const result = await service.findOne(invoiceId);
+    it('should return all invoices', async () => {
+      mockInvoiceModel.find.mockImplementation(() => ({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue(mockInvoices),
+        }),
+      }));
 
-//       expect(mockInvoiceModel.findById).toHaveBeenCalledWith(invoiceId);
-//       expect(result).toEqual(mockInvoice);
-//     });
+      const result = await service.findAll();
 
-//     it('should throw an error if invoice not found', async () => {
-//       const invoiceId = 'invoiceId1';
+      expect(mockInvoiceModel.find).toHaveBeenCalled();
+      expect(result).toEqual(mockInvoices);
+    });
+  });
 
-//       mockInvoiceModel.findById.mockResolvedValue(null);
+  describe('findOne', () => {
+    const mockInvoice = {
+      _id: 'invoice1',
+      items: [],
+      totalPrice: 100,
+    };
 
-//       await expect(service.findOne(invoiceId)).rejects.toThrowError(
-//         'Invoice not found',
-//       );
-//     });
-//   });
+    it('should return an invoice by id', async () => {
+      mockInvoiceModel.findById.mockImplementation(() => ({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue(mockInvoice),
+        }),
+      }));
 
-//   describe('update', () => {
-//     it('should update an invoice', async () => {
-//       const invoiceId = 'invoiceId1';
-//       const updateInvoiceDto = {
-//         orderId: ['orderId1'],
-//         note: 'Test unit update',
-//       };
-//       const mockInvoice = {
-//         _id: 'invoiceId1',
-//         orderId: ['orderId1'],
-//         items: [
-//           {
-//             productId: 'productId1',
-//             name: 'Product 1',
-//             price: 100,
-//             quantity: 1,
-//             totalPrice: 100,
-//           },
-//         ],
-//         totalPrice: 100,
-//         note: 'Test unit',
-//       };
-//       const mockOrder = {
-//         _id: 'orderId1',
-//         product: [{ _id: 'productId1', quantity: 1 }],
-//       };
-//       const mockProduct = { _id: 'productId1', name: 'Product 1', price: 100 };
-//       const mockItems = [
-//         {
-//           productId: 'productId1',
-//           name: 'Product 1',
-//           price: 100,
-//           quantity: 1,
-//           totalPrice: 100,
-//         },
-//       ];
-//       const mockUpdatedInvoice = {
-//         _id: 'invoiceId1',
-//         orderId: ['orderId1'],
-//         items: mockItems,
-//         totalPrice: 100,
-//         note: 'Test unit update',
-//       };
+      const result = await service.findOne('invoice1');
 
-//       mockInvoiceModel.findById.mockResolvedValue(mockInvoice);
-//       jest.spyOn(orderModel, 'find').mockResolvedValue([mockOrder]);
-//       jest.spyOn(productModel, 'findById').mockResolvedValue(mockProduct);
-//       mockInvoiceModel.findByIdAndUpdate.mockResolvedValue(mockUpdatedInvoice);
+      expect(mockInvoiceModel.findById).toHaveBeenCalledWith('invoice1');
+      expect(result).toEqual(mockInvoice);
+    });
 
-//       const result = await service.update(invoiceId, updateInvoiceDto);
+    it('should throw NotFoundException if invoice is not found', async () => {
+      mockInvoiceModel.findById.mockImplementation(() => ({
+        populate: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue(null),
+        }),
+      }));
 
-//       // expect(mockInvoiceModel.findById).toHaveBeenCalledWith(invoiceId);
-//       expect(orderModel.find).toHaveBeenCalledWith({
-//         _id: { $in: updateInvoiceDto.orderId },
-//       });
-//       expect(productModel.findById).toHaveBeenCalledWith(
-//         mockOrder.product[0]._id,
-//       );
-//       expect(mockInvoiceModel.findByIdAndUpdate).toHaveBeenCalledWith(
-//         invoiceId,
-//         {
-//           orderId: updateInvoiceDto.orderId,
-//           items: mockItems,
-//           totalPrice: 100,
-//           note: 'Test unit update',
-//         },
-//       );
-//       expect(result).toEqual(mockUpdatedInvoice);
-//     });
-//     it('should throw NotFoundException if invoice not found', async () => {
-//       const updateInvoiceDto = { orderId: ['orderId1'], note: 'Updated note' };
+      await expect(service.findOne('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
 
-//       mockInvoiceModel.findById.mockResolvedValue(null);
+  describe('remove', () => {
+    const mockInvoice = {
+      _id: 'invoice1',
+      items: [],
+      totalPrice: 100,
+    };
 
-//       await expect(
-//         service.update('invoiceId1', updateInvoiceDto),
-//       ).rejects.toThrowError('Invoice not found');
-//     });
-//   });
+    it('should delete an invoice successfully', async () => {
+      mockInvoiceModel.findByIdAndDelete.mockResolvedValue(mockInvoice);
 
-//   describe('remove', () => {
-//     it('should delete an invoice', async () => {
-//       const invoiceId = 'invoiceId1';
-//       const mockInvoice = { _id: 'invoiceId1', note: 'test' };
+      const result = await service.remove('invoice1');
 
-//       mockInvoiceModel.findByIdAndDelete.mockResolvedValue(mockInvoice);
+      expect(mockInvoiceModel.findByIdAndDelete).toHaveBeenCalledWith(
+        'invoice1',
+      );
+      expect(result).toEqual(mockInvoice);
+    });
 
-//       const result = await service.remove(invoiceId);
+    it('should throw NotFoundException if invoice to delete is not found', async () => {
+      mockInvoiceModel.findByIdAndDelete.mockResolvedValue(null);
 
-//       expect(mockInvoiceModel.findByIdAndDelete).toHaveBeenCalledWith(
-//         invoiceId,
-//       );
-//       expect(result).toEqual(mockInvoice);
-//     });
-
-//     it('should throw an error if invoice not found', async () => {
-//       const invoiceId = 'invoiceId1';
-
-//       mockInvoiceModel.findByIdAndDelete.mockResolvedValue(null);
-
-//       await expect(service.remove(invoiceId)).rejects.toThrowError(
-//         'Invoice not found',
-//       );
-//     });
-//   });
-// });
+      await expect(service.remove('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+});
